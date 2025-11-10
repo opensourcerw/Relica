@@ -1,36 +1,37 @@
-# Relica Installer (User-local, no admin required)
+# Relica Installer (user-local, resilient to ConstrainedLanguage)
 
 $ErrorActionPreference = "Stop"
+$installDir = "$env:LOCALAPPDATA\Programs\relica"
+$zipUrl    = "https://github.com/opensourcerw/relica/releases/latest/download/relica_windows_amd64.zip"
+$tempZip   = Join-Path $env:TEMP "relica.zip"
 
-$installDir = "$env:USERPROFILE\AppData\Local\Programs\relica"
-$exePath = "$installDir\relica.exe"
-$releaseUrl = "https://github.com/opensourcerw/relica/releases/latest/download/relica_windows_amd64.zip"
-$tempZip = "$env:TEMP\relica.zip"
+Write-Host "LanguageMode: $($ExecutionContext.SessionState.LanguageMode)"
 
-Write-Host "Checking install location: $installDir"
-
-# Create install directory if not exists
 if (!(Test-Path $installDir)) {
-    Write-Host "Creating install directory..."
     New-Item -ItemType Directory -Force -Path $installDir | Out-Null
 }
 
-Write-Host "Downloading latest Relica release..."
-Invoke-WebRequest -Uri $releaseUrl -OutFile $tempZip
-
-Write-Host "Extracting..."
+Invoke-WebRequest -Uri $zipUrl -OutFile $tempZip
 Expand-Archive -Path $tempZip -DestinationPath $installDir -Force
-Remove-Item $tempZip
+Remove-Item $tempZip -Force
 
-# Add to user PATH if missing
-$envPath = [System.Environment]::GetEnvironmentVariable("Path", "User")
-if ($envPath -notlike "*$installDir*") {
-    Write-Host "Adding Relica to user PATH..."
-    [System.Environment]::SetEnvironmentVariable(
-        "Path", "$envPath;$installDir", "User"
-    )
-    Write-Host "PATH updated — restart terminal to use Relica globally."
+$needsPath = ($env:Path -notlike "*$installDir*")
+
+if ($needsPath) {
+    if ($ExecutionContext.SessionState.LanguageMode -eq 'ConstrainedLanguage') {
+        Write-Host "ConstrainedLanguage: skipping automatic PATH modification."
+        Write-Host "Add manually or run:"
+        Write-Host "cmd /c setx PATH \"$env:Path;$installDir\""
+    } else {
+        $userPath = [Environment]::GetEnvironmentVariable('Path','User')
+        if ($userPath -notlike "*$installDir*") {
+            [Environment]::SetEnvironmentVariable('Path', "$userPath;$installDir", 'User')
+            Write-Host "Added to user PATH. Restart terminal."
+        }
+    }
+} else {
+    Write-Host "Already in PATH."
 }
 
-Write-Host "Relica installed successfully!"
-Write-Host "Run 'relica --version' to verify installation."
+Write-Host "Installed."
+Write-Host "Run: & '$installDir\\relica.exe' --version"
