@@ -4,35 +4,54 @@ Copyright © 2025 OpenSourceRW <open@opensourcerw.com>
 package cmd
 
 import (
+	"os"
 	"fmt"
-
+	"time"
+	
 	"github.com/spf13/cobra"
+	"github.com/opensourcerw/relica/internal/git"
+	"github.com/opensourcerw/relica/internal/config"
 )
 
 // initCmd represents the init command
 var initCmd = &cobra.Command{
 	Use:   "init",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
+	Short: "Initialize Relica in the current repository",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		// Step 1: Check for Git repo
+		if !git.IsGitRepo(".") {
+			return fmt.Errorf("no git repository found in the current directory")
+		}
 
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
-	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("init called")
+		// Step 2: Create .relica/ folder & config file
+		if err := os.MkdirAll(".relica", 0755); err != nil {
+			return fmt.Errorf("failed to create .relica config directory: %w", err)
+		}
+		if err := os.MkdirAll("relica", 0755); err != nil {
+			return fmt.Errorf("failed to create relica release directory: %w", err)
+		}
+
+		if config.Exists() {
+			return fmt.Errorf("Relica already initialized in this repository")
+		}
+
+		cfg := config.Config{
+			Initialized: true,
+			RepoPath:    ".",
+			CreatedAt:   time.Now(),
+			NotesDir:    "relica/",
+			Version:     "1.0.0",
+		}
+
+		if err := config.Save(cfg); err != nil {
+			return fmt.Errorf("failed to save Relica config: %w", err)
+		}
+
+		fmt.Println("✅ Relica initialized successfully in this repo.")
+		return nil
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(initCmd)
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// initCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// initCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
