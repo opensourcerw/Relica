@@ -25,6 +25,6 @@ release:
     owner: opensourcerw
     name: relica
   extra_files:
-    - scripts/Install-Relica.ps1
-    - LICENSE
-    - README.md
+    - glob: scripts/Install-Relica.ps1
+    - glob: LICENSE
+    - glob: README.md
