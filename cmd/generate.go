@@ -4,9 +4,8 @@ Copyright © 2025 OpenSourceRW <open@opensourcerw.com>
 package cmd
 
 import (
-	"fmt"
-
 	"github.com/spf13/cobra"
+	"github.com/opensourcerw/relica/internal/config"
 )
 
 // generateCmd represents the generate command
@@ -20,7 +19,11 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("generate called")
+
+		if !config.Exists() {
+			cmd.PrintErrln("this repository is not initialized — run 'relica init' first")
+			return
+		}
 	},
 }
 

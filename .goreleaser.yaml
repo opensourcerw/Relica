@@ -1,0 +1,28 @@
+project_name: relica
+builds:
+  - id: relica
+    main: ./main.go
+    binary: relica
+    ldflags:
+      - "-X github.com/opensourcerw/relica/pkg/version.Version={{.Version}}"
+      - "-X github.com/opensourcerw/relica/pkg/version.Commit={{.ShortCommit}}"
+      - "-X github.com/opensourcerw/relica/pkg/version.BuildDate={{.Date}}"
+    goos:
+      - windows
+      - linux
+      - darwin
+    goarch:
+      - amd64
+      - arm64
+archives:
+  - format: zip
+    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+extra_files:
+  - scripts/Install-Relica.ps1
+  - LICENSE
+  - README.md
+release:
+  github:
+    owner: opensourcerw
+    name: relica
+    
