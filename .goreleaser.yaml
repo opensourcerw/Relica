@@ -19,12 +19,12 @@ builds:
 archives:
   - format: zip
     name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
-extra_files:
-  - scripts/Install-Relica.ps1
-  - LICENSE
-  - README.md
+
 release:
   github:
     owner: opensourcerw
     name: relica
-    
+  extra_files:
+    - scripts/Install-Relica.ps1
+    - LICENSE
+    - README.md
