@@ -4,7 +4,7 @@ $ErrorActionPreference = "Stop"
 
 $installDir = "$env:USERPROFILE\AppData\Local\Programs\relica"
 $exePath = "$installDir\relica.exe"
-$releaseUrl = "https://github.com/opensourcerw/relica/releases/latest/download/relica_windows_amd64.zip"
+$releaseUrl = "https://github.com/opensourcerw/relica/releases/latest/download/relica_latest_windows_amd64.zip"
 $tempZip = "$env:TEMP\relica.zip"
 
 Write-Host "Checking install location: $installDir"
