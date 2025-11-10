@@ -21,7 +21,7 @@ if ($needsPath) {
     if ($ExecutionContext.SessionState.LanguageMode -eq 'ConstrainedLanguage') {
         Write-Host "ConstrainedLanguage: skipping automatic PATH modification."
         Write-Host "Add manually or run:"
-        Write-Host "cmd /c setx PATH \"$env:Path;$installDir\""
+        Write-Host ('cmd /c setx PATH "{0};{1}"' -f $env:Path, $installDir)
     } else {
         $userPath = [Environment]::GetEnvironmentVariable('Path','User')
         if ($userPath -notlike "*$installDir*") {
